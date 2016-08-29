@@ -77,7 +77,7 @@ public static function init
 				null, null, null
 			);
 			
-			// Renderer
+			// Canvas
 			canvas = new Canvas
 			(
 				System.windowWidth(), System.windowHeight(),

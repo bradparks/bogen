@@ -4,9 +4,10 @@ import bogen.input.Input;
 import bogen.render.Canvas;
 
 /* Typed simulation with children.
- * Propagates onUpdate and onDraw handles. onInput shoul be propafated
+ * Propagates onUpdate and onDraw handles. onInput should be propagated
  * explicitly by calling trickleDownInput or trickleDownHandled. */
-@:generic class TypedSimulation<T: BaseSimulation> extends BaseSimulation
+@:generic
+class TypedSimulation<T: BaseSimulation> extends BaseSimulation
 {
 
 // Children

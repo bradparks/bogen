@@ -6,7 +6,7 @@ import kha.FastFloat;
 class Angle
 {
 
-// Clamps an angle between [-180, 180[
+// Wraps an angle between [-180, 180[
 public static inline function wrap(angle: FastFloat)
 {
 	var result = (angle + 180) % 360;

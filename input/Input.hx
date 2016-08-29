@@ -63,21 +63,14 @@ public inline function pointerJustPressed()
 
 // Check if a button has just been released
 public inline function pointerJustReleased()
-{
 	return pointerState == PointerState.JUST_RELEASED;
-}
 
 // Check if the pointer is moving
 public inline function pointerMoving()
-{
 	return pointerState == PointerState.MOVING;
-}
 
 // Check if a key has just been pressed
-public inline function anyKey()
-{
-	return keyType != null;
-}
+public inline function anyKey() return keyType != null;
 
 // Representation
 public inline function toString()

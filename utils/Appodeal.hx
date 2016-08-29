@@ -34,14 +34,14 @@ public static function init(appKey: String, interstitialTime: Int)
 		
 		com.appodeal.ads.Appodeal.disableLocationPermissionCheck();
 		com.appodeal.ads.Appodeal.disableWriteExternalStoragePermissionCheck();
-		com.appodeal.ads.Appodeal.setLogging(true);
+		com.appodeal.ads.Appodeal.setLogging(false);
 		
 		com.appodeal.ads.Appodeal.initialize
 		(
 			com.ktxsoftware.kha.KhaActivity.the(),
 			appKey,
-				com.appodeal.ads.Appodeal.INTERSTITIAL
-				| com.appodeal.ads.Appodeal.BANNER
+			com.appodeal.ads.Appodeal.INTERSTITIAL
+			| com.appodeal.ads.Appodeal.BANNER
 		);
 	");
 }

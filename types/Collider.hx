@@ -14,7 +14,7 @@ public var box: Rect;
 // Called when colliding. Should return true if the collision was processed
 public var onCollide: Void->Bool;
 
-// Collider won't work when its health reach zero
+// Collider will trigger when its health reach zero
 public var health: Int;
 
 // Cria
