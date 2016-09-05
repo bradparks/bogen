@@ -5,7 +5,6 @@ import bogen.types.Rect;
 import kha.Color;
 import kha.graphics2.ImageScaleQuality;
 
-// FIMXE: Refactor calculations
 class Slice9 extends BaseSimulation
 {
 
