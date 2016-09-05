@@ -27,8 +27,14 @@ private inline function set(realElapsed: FastFloat, scale: FastFloat)
 // Creates a new TimeStep with a different scale
 public function changeScale(scale: FastFloat)
 	return new TimeStep(realElapsed, scale);
+	
+// Pauses time
+public function pause() return changeScale(0);
 
 // Creates a new TimeStep using the real time
 public function asRealTimeStep() return new TimeStep(realElapsed, 1);
+
+// Representation
+public function toString() return 'Timestep: $elapsed'; 
 
 }
