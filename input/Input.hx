@@ -47,7 +47,7 @@ private function resetWithPointer
 	pointerState: PointerState, pointerIndex: Int = -1
 )
 {
-	cast (pointerPosition, Vec).set(x, y);
+	cast (pointerPosition, Vec).set(x / scale, y / scale);
 	
 	reset();
 	
