@@ -5,7 +5,16 @@ class Message
 {
 
 // Language used by all messages
-public static var language: Language;
+@:isVar public static var language(get, set): Language;
+public static function get_language()
+{
+	#if (debug && bogen_force_pt)
+		return Language.PT;
+	#else
+		return language;
+	#end
+}
+public static function set_language(value: Language) return language = value;
 
 // Messages. English is default
 private var en: String;
