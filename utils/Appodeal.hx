@@ -1,20 +1,27 @@
 package bogen.utils;
 
+import kha.FastFloat;
+
 #if (sys_android && !bogen_no_ads)
 
-import kha.FastFloat;
 import kha.Scheduler;
 
 // Show ads with Appodeal
 class Appodeal
 {
 
+// Banner height
+public static var bannerHeight(default, null): FastFloat;
+
+// Interstitial time
 private static var isterstitialInterval: FastFloat;
 private static var lastInterstitialTime: FastFloat;
 
 // Initialize. This function cannot be inlined
 public static function init(appKey: String, interstitialTime: Int)
 {
+	var activity = Device.activity();
+	
 	Appodeal.isterstitialInterval = interstitialTime;
 	lastInterstitialTime = Scheduler.realTime();
 	
@@ -38,8 +45,7 @@ public static function init(appKey: String, interstitialTime: Int)
 		
 		com.appodeal.ads.Appodeal.initialize
 		(
-			com.ktxsoftware.kha.KhaActivity.the(),
-			appKey,
+			activity, appKey,
 			com.appodeal.ads.Appodeal.INTERSTITIAL
 			| com.appodeal.ads.Appodeal.BANNER
 		);
@@ -49,13 +55,12 @@ public static function init(appKey: String, interstitialTime: Int)
 // Show a banner at the top
 public static inline function showBanner()
 {
+	var activity = Device.activity();
+	
 	untyped __java__
 	("
 		com.appodeal.ads.Appodeal.show
-		(
-			com.ktxsoftware.kha.KhaActivity.the(),
-			com.appodeal.ads.Appodeal.BANNER_TOP
-		);
+			(activity, com.appodeal.ads.Appodeal.BANNER_BOTTOM);
 	");
 }
 
@@ -66,14 +71,13 @@ public static inline function showInterstitial()
 	if (elapsed < isterstitialInterval) return;
 	
 	lastInterstitialTime = Scheduler.realTime();
+
+	var activity = Device.activity();
 	
 	untyped __java__
 	("
 		com.appodeal.ads.Appodeal.show
-		(
-			com.ktxsoftware.kha.KhaActivity.the(),
-			com.appodeal.ads.Appodeal.INTERSTITIAL
-		);
+			(activity, com.appodeal.ads.Appodeal.INTERSTITIAL);
 	");
 }
 
@@ -86,9 +90,10 @@ class Appodeal
 
 public static inline function init(appKey: String, interstitialTime: Int)
 	{ /*EMPTY*/ }
-public static inline function showBanner() { /*EMPTY*/ }
-public static inline function showInterstitial() { /*EMPTY*/ }
-
+public static inline function showBanner()
+	{ /*EMPTY*/ }
+public static inline function showInterstitial()
+	{ /*EMPTY*/ }
 }
 
 #end
