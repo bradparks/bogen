@@ -1,6 +1,7 @@
 package bogen.render;
 
 import bogen.math.Angle;
+import bogen.utils.Device;
 import kha.Assets;
 import kha.Color;
 import kha.FastFloat;
@@ -18,6 +19,9 @@ private var backgroundColor: Color;
 // Scale and center transformations
 private var scaleTransformation: FastMatrix3;
 private var centerTransformation: FastMatrix3;
+
+// Banner's height
+private var bannerHeight: FastFloat;
 
 // Shortcut to g2
 public var graphic(default, null): Graphics;
@@ -42,9 +46,16 @@ public inline function new
 	createBackbufferTransformation
 		(screenWidth, screenHeight, canvasWidth, canvasHeight);
 	
-	// Tamanho do canvas
+	// Canvas' size
 	this.canvasWidth = screenWidth / scale;
 	this.canvasHeight = screenHeight / scale;
+	
+	// Banner's height
+	#if (sys_android && !bogen_no_ads)
+		bannerHeight = Device.dipToPixels(50) / scale;
+	#else
+		bannerHeight = 0;
+	#end
 }
 
 // Setup scale and center based on window size
@@ -81,11 +92,11 @@ public inline function top(dy: FastFloat) return dy;
 public inline function right(dx: FastFloat, width: FastFloat)
 	return canvasWidth - dx - width;
 public inline function bottom(dy: FastFloat, height: FastFloat)
-	return canvasHeight - dy - height;
+	return canvasHeight - bannerHeight - dy - height - bannerHeight;
 public inline function hCenter(dx: FastFloat, width: FastFloat)
 	return (canvasWidth - width) / 2 - dx;
 public inline function vCenter(dy: FastFloat, height: FastFloat)
-	return (canvasHeight - height) / 2 - dy;
+	return (canvasHeight - bannerHeight - height) / 2 - dy;
 
 // Initialize canvas to draw
 @:allow(bogen.simulation.Game)
