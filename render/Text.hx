@@ -37,22 +37,19 @@ public var speed: Vec;
 // Box
 public var box: Vec;
 
-// Centralizes text
-public var center: Bool;
-
 // Pre renders a font with the specified sizes
 public static inline function initFont(font: Font, sizes: Array<Int>)
 {
 	#if debug
 	preRendered = [];
 	#end
-		
+	
 	for (size in sizes)
 	{
-		font.width(size, "t");
-		
 		#if debug
-		preRendered.push({ font: font, size: size });
+			preRendered.push({ font: font, size: size });
+		#else
+			font.width(size, "t");
 		#end
 	}
 }
@@ -92,11 +89,9 @@ public function new
 	
 	position = new Vec(positionX, positionY);
 	
-	center = false;
-	
 	defaultLineHeight = font.height(size);
-	percentLineHeight = 1;
-	paragraphHeight = 1.2;
+	percentLineHeight = 1.2;
+	paragraphHeight = 1.8;
 	
 	box = boxSize();
 }
@@ -106,7 +101,7 @@ private function boxSize()
 {
 	var result = new Vec
 	(
-		0, 
+		0,
 		(processedText.length - 1)
 		* defaultLineHeight
 		* (paragraphHeight - percentLineHeight)
@@ -143,10 +138,7 @@ override public function onDraw(canvas: Canvas, timeStep: TimeStep)
 	{
 		for (line in paragraph)
 		{
-			var x = position.x;
-			if (center) x += (box.x - font.width(size, line)) / 2;
-			
-			g.drawString(line, x, y);
+			g.drawString(line, position.x, y);
 			y += defaultLineHeight * percentLineHeight;
 		}
 		
@@ -169,8 +161,6 @@ public static function central
 	
 	result.position.x = centerX - result.box.x / 2;
 	result.position.y = centerY - result.box.y / 2;
-	
-	result.center = true;
 	
 	return result;
 }
