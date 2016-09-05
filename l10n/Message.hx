@@ -19,6 +19,13 @@ public function new(en: String, pt: String)
 }
 
 // Return the string for a message
-public function toText() return language == Language.PT? pt: en;
+public function toText()
+{
+	#if (debug && bogen_force_pt)
+		return pt;
+	#else
+		return language == Language.PT? pt: en;
+	#end
+}
 
 }
