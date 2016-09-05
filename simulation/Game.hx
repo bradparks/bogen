@@ -13,25 +13,20 @@ import kha.System;
 @:access(kha.System, kha.Scheduler)
 class Game
 {
-	
-// Max time between each render event
-private static inline var RENDER_MAX_ELAPSED = 15 / 60;
-
-// Last render time
-private static var lastRenderTime: FastFloat;
-
-// Amount of times to update each render event
-public static var updatesPerRender: Int;
 
 // Current scene
 @:allow(bogen.input.InputManager)
 private static var scene: Scene;
 
+// Update period
+public static var updatePeriod: FastFloat;
+
 // Canvas
 public static var canvas: Canvas;
 
-// Time passed between each render
-private static var timeStep: TimeStep;
+// Time passed between events
+private static var renderStep: TimeStep;
+private static var updateStep: TimeStep;
 
 // Initialize
 public static function init
@@ -45,9 +40,9 @@ public static function init
 )
 {
 	scene = new Scene();
-	timeStep = new TimeStep(0, 1);
 	
-	Game.updatesPerRender = updatesPerRender;
+	renderStep = new TimeStep(1 / 60, 1);
+	updateStep = new TimeStep(renderStep.elapsed / updatesPerRender, 1);
 	
 	// Clears the screen
 	System.notifyOnRender(function(framebuffer)
@@ -64,19 +59,6 @@ public static function init
 			// Removes the previous render notifier
 			System.renderListeners.pop();
 			
-			// Updates the last render time and resets the schedule
-			function updateLastRenderTime()
-			{
-				Scheduler.resetTime();
-				lastRenderTime = getCurrentTime();
-			}
-			
-			System.notifyOnApplicationState
-			(
-				updateLastRenderTime, updateLastRenderTime,
-				null, null, null
-			);
-			
 			// Canvas
 			canvas = new Canvas
 			(
@@ -91,9 +73,9 @@ public static function init
 			// Callback
 			if (onReady != null) onReady();
 			
-			// Update the last render time as late as possible
-			lastRenderTime = getCurrentTime();
-			
+			// Updates the game
+			Scheduler.resetTime();
+			Scheduler.addTimeTask(onGameUpdate, 0, updateStep.elapsed);
 		});
 	}
 	
@@ -102,40 +84,23 @@ public static function init
 		({ title: title, width: screenWidth, height: screenHeight }, onInit);
 }
 
+// Called by Kha to update the game
+public static function onGameUpdate() scene.onUpdate(updateStep);
+
 // Called by Kha to draw
 public static function onRender(framebuffer: Framebuffer)
-{
-	var time = getCurrentTime();
-	
-	// Time between calls
-	var renderElapsed = time - lastRenderTime;
-	if (renderElapsed > RENDER_MAX_ELAPSED) renderElapsed = RENDER_MAX_ELAPSED;
-	lastRenderTime = time;
-	
-	// Update scene
-	timeStep.set(renderElapsed  / updatesPerRender, 1);
-	for (_ in 0...updatesPerRender) scene.onUpdate(timeStep);
-	
+{	
 	// Initialize buffer
 	canvas.beginBuffer(framebuffer);
 	
 	// Draw scene
-	timeStep.set(renderElapsed, 1);
-	scene.onDraw(canvas, timeStep);
+	scene.onDraw(canvas, renderStep);
 	
 	// Draw debug information
 	InputManager.drawPointer(canvas);
 	
 	// Update screen and finishes buffer
 	canvas.endBuffer();
-}
-
-// Current time
-private static inline function getCurrentTime()
-{
-	var time = Scheduler.time();
-	if (time > 15) return time;
-	return Scheduler.realTime();
 }
 
 // Count the objects in a simulation
