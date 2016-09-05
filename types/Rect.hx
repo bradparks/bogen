@@ -25,10 +25,10 @@ public inline function new
 }
 
 // Representation
-public inline function toString(): String
-{
-	return 'Rect($x, $y, $width, $height)';
-}
+public inline function toString() return 'Rect($x, $y, $width, $height)';
+
+// Copy
+public inline function copy() return new Rect(x, y, width, height);
 
 // Check if the rect collides with a point
 public inline function collidePoint(otherX: FastFloat, otherY: FastFloat): Bool
