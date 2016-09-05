@@ -17,7 +17,8 @@ public var children: Array<T>;
 public function new() children = [];
 
 // Add a child
-public inline function add(child: T) children.push(child);
+public inline function add(child: T)
+	if (child != null) children.push(child);
 
 // Removes a child
 public inline function remove(child: T) children.remove(child);
