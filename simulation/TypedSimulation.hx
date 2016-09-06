@@ -46,7 +46,7 @@ public function trickleDownHandled(input: Input)
 // Update all children
 override public function onUpdate(timeStep: TimeStep): Void
 {
-	if (timeStep.elapsed <= 0) return;
+	if (timeStep.elapsed < 0) return;
 	for (child in children) child.onUpdate(timeStep);
 }
 
