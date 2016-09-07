@@ -33,4 +33,8 @@ public function new
 public inline function applyAngularVelocity(elapsed: FastFloat)
 	angle += angularVelocity * elapsed;
 
+// Representation
+public inline function toString()
+	return 'Rotation: (${ pivot.x }, ${ pivot.y }, angle: $angle)';
+	
 }
