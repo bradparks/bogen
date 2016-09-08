@@ -92,7 +92,7 @@ override public function onDraw(canvas: Canvas, _)
 		rectFill.width, b.height
 	);
 	
-	//// Left
+	// Left
 	canvas.drawResized
 	(
 		l,
