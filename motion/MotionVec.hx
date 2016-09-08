@@ -63,7 +63,7 @@ public function new
 }
 
 // Tween function
-public function tween(t: FastFloat) return t;
+public function tween(t: FastFloat): FastFloat return t;
 
 // Update
 override public function onUpdate(timeStep: TimeStep)
