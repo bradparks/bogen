@@ -128,6 +128,7 @@ override public function onDraw(canvas: Canvas, timeStep: TimeStep)
 	var g = canvas.graphic;
 	
 	g.fontSize = size;
+	g.font = font;
 	
 	var oldColor = g.color;
 	g.color = color;
