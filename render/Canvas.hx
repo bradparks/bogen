@@ -105,7 +105,6 @@ private inline function beginBuffer(framebuffer: Framebuffer)
 	graphic = framebuffer.g2;
 	
 	graphic.imageScaleQuality = ImageScaleQuality.High;
-	graphic.font = Assets.fonts.Quicksand_Bold;
 	
 	graphic.pushTransformation(scaleTransformation);
 	
