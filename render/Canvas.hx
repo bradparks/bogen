@@ -92,7 +92,7 @@ public inline function top(dy: FastFloat) return dy;
 public inline function right(dx: FastFloat, width: FastFloat)
 	return canvasWidth - dx - width;
 public inline function bottom(dy: FastFloat, height: FastFloat)
-	return canvasHeight - bannerHeight - dy - height - bannerHeight;
+	return canvasHeight - bannerHeight - dy - height;
 public inline function hCenter(dx: FastFloat, width: FastFloat)
 	return (canvasWidth - width) / 2 - dx;
 public inline function vCenter(dy: FastFloat, height: FastFloat)
