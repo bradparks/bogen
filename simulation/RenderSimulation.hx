@@ -3,7 +3,8 @@ package bogen.simulation;
 import bogen.render.Canvas;
 
 // Updates only on onDraw. Useful for objects that are purely visual
-@:generic class RenderSimulation<T: BaseSimulation> extends TypedSimulation<T>
+@:generic
+class RenderSimulation<T: BaseSimulation> extends TypedSimulation<T>
 {
 
 // Does nothing, will update on onDraw
