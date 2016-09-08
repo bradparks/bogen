@@ -24,6 +24,9 @@ public static var updatePeriod: FastFloat;
 // Canvas
 public static var canvas: Canvas;
 
+// Last render time
+private static var lastRenderTime: FastFloat;
+
 // Time passed between events
 private static var renderStep: TimeStep;
 private static var updateStep: TimeStep;
@@ -76,6 +79,8 @@ public static function init
 			// Updates the game
 			Scheduler.resetTime();
 			Scheduler.addTimeTask(onGameUpdate, 0, updateStep.elapsed);
+			
+			lastRenderTime = Scheduler.time();
 		});
 	}
 	
@@ -92,6 +97,10 @@ public static function onRender(framebuffer: Framebuffer)
 {	
 	// Initialize buffer
 	canvas.beginBuffer(framebuffer);
+	
+	// Update render elapsed
+	renderStep.set(Scheduler.time() - lastRenderTime, 1);
+	lastRenderTime = Scheduler.time();
 	
 	// Draw scene
 	scene.onDraw(canvas, renderStep);
