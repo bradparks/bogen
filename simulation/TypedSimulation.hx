@@ -2,11 +2,8 @@ package bogen.simulation;
 
 import bogen.input.Input;
 import bogen.render.Canvas;
-import bogen.simulation.TimeStep;
 
-/* Typed simulation with children.
- * Propagates onUpdate and onDraw handles. onInput should be propagated
- * explicitly by calling trickleDownInput or trickleDownHandled. */
+/* Typed simulation with children */
 @:generic
 class TypedSimulation<T: BaseSimulation> extends BaseSimulation
 {
@@ -18,8 +15,7 @@ public var children: Array<T>;
 public function new() children = [];
 
 // Add a child
-public inline function add(child: T)
-	if (child != null) children.push(child);
+public inline function add(child: T) children.push(child);
 
 // Removes a child
 public inline function remove(child: T)
@@ -30,14 +26,10 @@ public inline function remove(child: T)
 
 // Remove all children
 public inline function removeAll() children = [];
-
-// Apply input to all children.
-public inline function trickleDownInput(input: Input)
-	for (child in children) child.onInput(input);
 	
 /* Apply input to all children until one handles it.
  * Starts from the back because those are drawn at the front. */
-public function trickleDownHandled(input: Input)
+override public function onInput(input: Input)
 {
 	var i = children.length - 1;
 	while (i >= 0)
@@ -50,18 +42,10 @@ public function trickleDownHandled(input: Input)
 
 // Update all children
 override public function onUpdate(timeStep: TimeStep): Void
-{
-	if (timeStep.elapsed < 0) return;
-	
-	//var iter = children;
 	for (child in children) child.onUpdate(timeStep);
-}
 
 // Draw all children
 override public function onDraw(canvas: Canvas, timeStep: TimeStep): Void
-{
-	//var iter = children;
 	for (child in children) child.onDraw(canvas, timeStep);
-}
 
 }

@@ -30,13 +30,13 @@ public function new()
 // Input
 override public function onInput(input: Input) 
 {
-	
 	if (input.keyType == Key.ENTER) pause = !pause;
 	else if (input.keyType == Key.CTRL)
 	{
 		updateStep = renderStep = true;
 		pause = true;
 	}
+	
 	super.onInput(input);
 }
 
