@@ -19,4 +19,7 @@ public inline function get_x() return this.x;
 public inline function get_y() return this.y;
 public inline function get_length() return (cast (this, Vec)).length;
 
+public inline function addScalar(x: FastFloat, y: FastFloat)
+	return new ConstVec(this.x + x, this.y + y);
+
 }
