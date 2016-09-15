@@ -12,13 +12,16 @@ class Input
 // Should the input stop propagating?
 public var stopPropagation: Bool;
 
+// Is the input being dragged?
+public var isDragging: Bool;
+
 // Pointer state
 public var pointerState(default, null): PointerState;
 public var pointerPosition(default, null): ConstVec;
 public var pointerIndex(default, null): Int;
 
 // Keyboard input
-public var keyType: Null<Key>;
+public var keyType: Key;
 public var keyCode: String;
 
 // Constructor
@@ -32,6 +35,7 @@ public function new()
 private function reset()
 {
 	stopPropagation = false;
+	isDragging = false;
 	
 	pointerState = PointerState.NONE;
 	pointerIndex = -1;
@@ -57,9 +61,7 @@ private function resetWithPointer
 
 // Check if a button has just been pressed
 public inline function pointerJustPressed()
-{
 	return pointerState == PointerState.JUST_PRESSED;
-}
 
 // Check if a button has just been released
 public inline function pointerJustReleased()
