@@ -4,6 +4,7 @@ import bogen.input.Input;
 import bogen.simulation.BaseSimulation;
 import bogen.simulation.Simulation;
 import bogen.types.Rect;
+import bogen.types.Vec;
 import kha.FastFloat;
 
 class Button extends BaseSimulation
@@ -15,6 +16,9 @@ private var pressed: Frame;
 
 // Is the button being held?
 public var holding(default, null): Bool;
+
+// Position
+private var position: Vec;
 
 // Box
 private var box: Rect;
@@ -30,7 +34,7 @@ public function new
 (
 	x: FastFloat, y: FastFloat,
 	normal: Frame, pressed: Frame,
-	onPress: Void->Void
+	onPress: Void->Void, border = .0
 )
 {
 	this.normal = normal;
@@ -39,30 +43,42 @@ public function new
 	pressedOver = [];
 	holding = false;
 	
-	box = new Rect(x, y, normal.width, normal.height);
+	position = new Vec(x, y);
+	box = new Rect
+	(
+		x + border, y + border,
+		normal.width - 2 * border, normal.height - 2 * border
+	);	
 	
 	this.onPress = onPress;
 }
 
 // Input
+@SuppressWarnings("checkstyle:CyclomaticComplexity")
 override public function onInput(input: Input)
 {
 	var x = input.pointerPosition.x;
 	var y = input.pointerPosition.y;
 	
+	// If it's dragging stop everything
+	if (input.isDragging)
+	{
+		pressedOver = [];
+		holding = false;
+	}
+	
 	// If just pressed
-	if (input.pointerJustPressed())
+	else if (input.pointerJustPressed())
 	{
 		if (box.collidePoint(x, y))
 		{
 			pressedOver[input.pointerIndex] = holding = true;
 			input.stopPropagation = true;
 		}
-		return;
 	}
 	
 	// If just released
-	if (input.pointerJustReleased())
+	else if (input.pointerJustReleased())
 	{
 		pressedOver[input.pointerIndex] = false;
 		
@@ -78,7 +94,7 @@ override public function onInput(input: Input)
 	}
 	
 	// If moving
-	if (input.pointerMoving())
+	else if (input.pointerMoving())
 	{
 		var collide = box.collidePoint(x, y);
 		
@@ -97,7 +113,7 @@ override public function onInput(input: Input)
 
 // Draw
 override public function onDraw(canvas: Canvas, _)
-	canvas.draw(holding? pressed: normal, box.x, box.y);
+	canvas.draw(holding? pressed: normal, position.x, position.y);
 
 // Check if the user is holding over the button
 private function checkPressed()
