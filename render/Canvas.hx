@@ -1,8 +1,8 @@
 package bogen.render;
 
 import bogen.math.Angle;
+import bogen.types.Vec;
 import bogen.utils.Device;
-import kha.Assets;
 import kha.Color;
 import kha.FastFloat;
 import kha.Framebuffer;
@@ -16,18 +16,24 @@ class Canvas
 // Background color
 private var backgroundColor: Color;
 
-// Scale and center transformations
+// Scale transformation
 private var scaleTransformation: FastMatrix3;
-private var centerTransformation: FastMatrix3;
+
+// Canvas' offset from window
+public var centerOffset: Vec;
 
 // Banner's height
-private var bannerHeight: FastFloat;
+public var bannerHeight(default, null): FastFloat;
 
 // Shortcut to g2
 public var graphic(default, null): Graphics;
 
 // Scale of the window/canvas
 public var scale(default, null): FastFloat;
+
+// Target canvas' size
+public var targetCanvasWidth(default, null): FastFloat;
+public var targetCanvasHeight(default, null): FastFloat;
 
 // Canvas' size
 public var canvasWidth(default, null): FastFloat;
@@ -37,18 +43,16 @@ public var canvasHeight(default, null): FastFloat;
 public inline function new
 (
 	screenWidth: Int, screenHeight: Int,
-	canvasWidth: FastFloat, canvasHeight: FastFloat,
+	targetCanvasWidth: FastFloat, targetCanvasHeight: FastFloat,
 	backgroundColor: Color
 )
 {
 	this.backgroundColor = backgroundColor;
 	
-	createBackbufferTransformation
-		(screenWidth, screenHeight, canvasWidth, canvasHeight);
+	this.targetCanvasWidth = targetCanvasWidth;
+	this.targetCanvasHeight = targetCanvasHeight;
 	
-	// Canvas' size
-	this.canvasWidth = screenWidth / scale;
-	this.canvasHeight = screenHeight / scale;
+	createTransformations(screenWidth, screenHeight);
 	
 	// Banner's height
 	#if (sys_android && !bogen_no_ads)
@@ -59,14 +63,11 @@ public inline function new
 }
 
 // Setup scale and center based on window size
-private inline function createBackbufferTransformation
-(
-	screenWidth: Int, screenHeight: Int,
-	canvasWidth: FastFloat, canvasHeight: FastFloat
-)
+private inline function createTransformations
+	(screenWidth: Int, screenHeight: Int)
 {
-	var xratio = screenWidth / canvasWidth;
-	var yratio = screenHeight / canvasHeight;
+	var xratio = screenWidth / targetCanvasWidth;
+	var yratio = screenHeight / targetCanvasHeight;
 	
 	var dx = .0;
 	var dy = .0;
@@ -74,29 +75,22 @@ private inline function createBackbufferTransformation
 	if (xratio < yratio)
 	{
 		scale = xratio;
-		dy = (screenHeight - scale * canvasHeight) / 2;
+		dy = (screenHeight - scale * targetCanvasHeight) / 2 / scale;
 	}
 	else
 	{
 		scale = yratio;
-		dx = (screenWidth - scale * canvasWidth) / 2;
+		dx = (screenWidth - scale * targetCanvasWidth) / 2 / scale;
 	}
 	
+	// Canvas' size
+	canvasWidth = screenWidth / scale;
+	canvasHeight = screenHeight / scale;
+	
+	// Scale transformation
 	scaleTransformation = FastMatrix3.scale(scale, scale);
-	centerTransformation = FastMatrix3.translation(dx / scale, dy / scale);
+	centerOffset = new Vec(dx, dy);
 }
-
-// Canvas' related position
-public inline function left(dx: FastFloat) return dx;
-public inline function top(dy: FastFloat) return dy;
-public inline function right(dx: FastFloat, width: FastFloat)
-	return canvasWidth - dx - width;
-public inline function bottom(dy: FastFloat, height: FastFloat)
-	return canvasHeight - bannerHeight - dy - height;
-public inline function hCenter(dx: FastFloat, width: FastFloat)
-	return (canvasWidth - width) / 2 - dx;
-public inline function vCenter(dy: FastFloat, height: FastFloat)
-	return (canvasHeight - bannerHeight - height) / 2 - dy;
 
 // Initialize canvas to draw
 @:allow(bogen.simulation.Game)
@@ -115,15 +109,20 @@ private inline function beginBuffer(framebuffer: Framebuffer)
 @:allow(bogen.simulation.Game)
 private inline function endBuffer()
 {
+	#if debug
+		graphic.pushTransformation(FastMatrix3.scale(scale, scale));
+		var banner = 100;
+		drawFill
+		(
+			0, canvasHeight - banner,
+			canvasWidth, banner,
+			0xff947f7c
+		);
+		graphic.popTransformation();
+	#end
+	
 	graphic.popTransformation();
 	graphic.end();
-}
-
-// Adds a centering matrix. Canvas will be drawn at the center of the screen
-public inline function addCenterMatrix()
-{
-	graphic.pushTransformation
-		(graphic.transformation.multmat(centerTransformation));
 }
 
 // Draw a frame with the specified size
@@ -140,6 +139,19 @@ public inline function drawResized
 		frame.x, frame.y, frame.width, frame.height,
 		x, y, width, height
 	);
+}
+
+// Draw a frame with the specified size in low quality to avoid blurriness
+public inline function drawResizedLowQuality
+(
+	frame: Frame,
+	x: FastFloat, y: FastFloat,
+	width: FastFloat, height: FastFloat
+)
+{
+	graphic.imageScaleQuality = ImageScaleQuality.Low;
+	drawResized(frame, x, y, width, height);
+	graphic.imageScaleQuality = ImageScaleQuality.High;
 }
 
 // Draw a frame
