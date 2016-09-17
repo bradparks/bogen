@@ -36,14 +36,14 @@ public var draggers: Array
 public var currentChild(default, null): Int;
 
 // Constructor
-public function new(dx: FastFloat, dy: FastFloat)
+public function new(dx: FastFloat, dy: FastFloat, startChild: Int)
 {
 	super();
 
-	currentChild = 0;
+	currentChild = startChild;
 	offset = new Vec(dx, dy);
 	
-	translation = new Vec(0, 0);
+	translation = new Vec(-currentChild * offset.x, 0);
 	draggers = [];
 	moveBackAnimation = null;
 }

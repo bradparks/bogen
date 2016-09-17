@@ -125,6 +125,21 @@ private inline function endBuffer()
 	graphic.end();
 }
 
+// Positions related to the screen
+public inline function screenLeft() return 0;
+public inline function screenRight(width: FastFloat) return canvasWidth - width;
+public inline function screenTop() return 0;
+public inline function screenBottom(height: FastFloat)
+	return canvasHeight - bannerHeight - height;
+public inline function screenHCenter(width: FastFloat)
+	return (canvasWidth - width) / 2;
+public inline function screenVCenter(height: FastFloat)
+	return (canvasHeight - bannerHeight - height) / 2;
+	
+// Positions related to the canvas
+public inline function canvasLeft() return centerOffset.x;
+public inline function canvasTop() return centerOffset.y;
+
 // Draw a frame with the specified size
 public inline function drawResized
 (

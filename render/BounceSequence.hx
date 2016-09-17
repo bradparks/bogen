@@ -27,7 +27,7 @@ public function new
 	{
 		var width = 0;
 		for (frame in frames) width += frame.width;
-		x = Game.canvas.hCenter(0, width);
+		x = Game.canvas.screenHCenter(width);
 	}
 	
 	position = new Vec(x, y);
