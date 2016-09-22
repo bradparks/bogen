@@ -3,12 +3,12 @@ package bogen.render;
 import bogen.transform.CameraTransform;
 import bogen.transform.Transform;
 import bogen.utils.Device;
-import kha.Font;
 import kha.Framebuffer;
 import kha.graphics2.Graphics;
 import kha.graphics2.ImageScaleQuality;
 import kha.math.FastMatrix3;
 
+// Camera. Performes all drawing operations
 class Camera
 {
 	
@@ -23,10 +23,7 @@ public var graphic(default, null): Graphics;
 
 // Constructor
 public function new
-(
-	screenWidth: Int, screenHeight: Int,
-	targetWidth: Int, targetHeight: Int
-)
+	(screenWidth: Int, screenHeight: Int, targetWidth: Int, targetHeight: Int)
 {
 	if (main == null) main = this;
 	
@@ -163,19 +160,5 @@ public function drawFill(transform: Transform)
 public inline function drawRectFixedStrength
 	(transform: Transform, strength: Float)
 	drawRect(transform, strength / this.transform.cameraScale);
-	
-// Draw a string
-public function drawString
-	(text: String, font: Font, fontSize: Int, transform: Transform)
-{
-	setupDraw(transform);
-	
-	graphic.font = font;
-	graphic.fontSize = fontSize;
-	
-	graphic.drawString(text, transform.left(), transform.top());
-	
-	cleanupDraw(transform);
-}
 
 }
