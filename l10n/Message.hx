@@ -19,7 +19,7 @@ public function new(en: String, pt: String)
 }
 
 // Return the string for a message
-public function toText()
+public function toString()
 {
 	return switch (language) 
 	{
