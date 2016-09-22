@@ -7,7 +7,7 @@ import haxe.ds.Option;
 	
 public static inline function none<T>(): Maybe<T> return cast Option.None;
 public static inline function some<T>(value: Null<T>) return new Maybe(value);
-public static inline function unsafeSome<T>(value: T)
+public static inline function unsafeSome<T>(value: T): Maybe<T>
 	return cast Option.Some(value);
 	
 public inline function new(value: Null<T>)
