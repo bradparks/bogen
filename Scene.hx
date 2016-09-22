@@ -1,7 +1,9 @@
-package bogen.simulation;
+package bogen;
 
 import bogen.input.Input;
-import bogen.render.Canvas;
+import bogen.render.Camera;
+import bogen.simulation.Simulation;
+import bogen.simulation.TimeStep;
 import kha.Key;
 
 class Scene extends Simulation
@@ -30,11 +32,16 @@ public function new()
 // Input
 override public function onInput(input: Input) 
 {
-	if (input.keyType == Key.ENTER) pause = !pause;
-	else if (input.keyType == Key.CTRL)
+	var keyType = input.keyType.orNull();
+	
+	if (keyType != null)
 	{
-		updateStep = renderStep = true;
-		pause = true;
+		if (keyType == Key.ENTER) pause = !pause;
+		else if (keyType == Key.CTRL)
+		{
+			updateStep = renderStep = true;
+			pause = true;
+		}
 	}
 	
 	super.onInput(input);
@@ -49,11 +56,11 @@ override public function onUpdate(timeStep: TimeStep)
 }
 
 // Draw
-override public function onDraw(canvas: Canvas, timeStep: TimeStep)
+override public function onDraw(camera: Camera, timeStep: TimeStep)
 {
 	if (pause && !renderStep) timeStep = new TimeStep(0, 0);
 	renderStep = false;
-	super.onDraw(canvas, timeStep);
+	super.onDraw(camera, timeStep);
 }
 
 #end

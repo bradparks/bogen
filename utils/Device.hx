@@ -1,6 +1,6 @@
 package bogen.utils;
+
 import bogen.l10n.Language;
-import kha.FastFloat;
 
 #if sys_android
 import com.ktxsoftware.kha.KhaActivity;
@@ -35,7 +35,7 @@ public static inline function language(): Language
 }
 
 // Device's pixel independent conversion
-public static function dipToPixels(dip: Int): FastFloat
+public static function dipToPixels(dip: Int): Float
 {
 	#if sys_android
 		return untyped __java__

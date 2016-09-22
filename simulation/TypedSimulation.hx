@@ -1,11 +1,11 @@
 package bogen.simulation;
 
+import bogen.component.Component;
 import bogen.input.Input;
-import bogen.render.Canvas;
+import bogen.render.Camera;
 
-/* Typed simulation with children */
-@:generic
-class TypedSimulation<T: BaseSimulation> extends BaseSimulation
+// Typed simulation with children
+@:generic class TypedSimulation<T: Component> extends Component
 {
 
 // Children
@@ -45,7 +45,7 @@ override public function onUpdate(timeStep: TimeStep): Void
 	for (child in children) child.onUpdate(timeStep);
 
 // Draw all children
-override public function onDraw(canvas: Canvas, timeStep: TimeStep): Void
-	for (child in children) child.onDraw(canvas, timeStep);
+override public function onDraw(camera: Camera, timeStep: TimeStep): Void
+	for (child in children) child.onDraw(camera, timeStep);
 
 }

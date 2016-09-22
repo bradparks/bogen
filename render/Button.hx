@@ -1,62 +1,58 @@
 package bogen.render;
 
+import bogen.component.Component;
 import bogen.input.Input;
-import bogen.simulation.BaseSimulation;
-import bogen.simulation.Simulation;
-import bogen.types.Rect;
-import bogen.types.Vec;
-import kha.FastFloat;
+import bogen.transform.Transform;
 
-class Button extends BaseSimulation
+// Button
+class Button extends Component
 {
 	
-// Drawing frames
-private var normal: Frame;
-private var pressed: Frame;
+// Components to draw
+private var normal: Array<Component>;
+private var pressed: Array<Component>;
 
-// Is the button being held?
-public var holding(default, null): Bool;
+// Touch or mouse buttons pressed over the button
+private var pressedOver: Array<Bool>;
 
-// Position
-private var position: Vec;
-
-// Box
-private var box: Rect;
+// Colliders's transform
+public var transform(default, null): Transform;
 
 // Pressed event
 public var onPress: Void->Void;
 
-// Touch or mouse buttons pressed over the box
-private var pressedOver: Array<Bool>;
+// Is the button being held?
+public var holding(default, null): Bool;
+
+// Is the button enabled?
+public var enabled: Bool;
 
 // Constructor
 public function new
 (
-	x: FastFloat, y: FastFloat,
-	normal: Frame, pressed: Frame,
-	onPress: Void->Void, border = .0
+	transform: Transform,
+	normal: Array<Component>, pressed: Array<Component>,
+	onPress: Void->Void
 )
 {
+	this.transform = transform;
+	
 	this.normal = normal;
 	this.pressed = pressed;
 	
 	pressedOver = [];
 	holding = false;
 	
-	position = new Vec(x, y);
-	box = new Rect
-	(
-		x + border, y + border,
-		normal.width - 2 * border, normal.height - 2 * border
-	);	
-	
 	this.onPress = onPress;
+	enabled = true;
 }
 
 // Input
 @SuppressWarnings("checkstyle:CyclomaticComplexity")
 override public function onInput(input: Input)
 {
+	if (!enabled) return;
+	
 	var x = input.pointerPosition.x;
 	var y = input.pointerPosition.y;
 	
@@ -70,7 +66,7 @@ override public function onInput(input: Input)
 	// If just pressed
 	else if (input.pointerJustPressed())
 	{
-		if (box.collidePoint(x, y))
+		if (transform.collidePoint(x, y))
 		{
 			pressedOver[input.pointerIndex] = holding = true;
 			input.stopPropagation = true;
@@ -82,7 +78,7 @@ override public function onInput(input: Input)
 	{
 		pressedOver[input.pointerIndex] = false;
 		
-		if (box.collidePoint(x, y))
+		if (transform.collidePoint(x, y))
 		{
 			var wasHolding = holding;
 			checkPressed();
@@ -96,7 +92,7 @@ override public function onInput(input: Input)
 	// If moving
 	else if (input.pointerMoving())
 	{
-		var collide = box.collidePoint(x, y);
+		var collide = transform.collidePoint(x, y);
 		
 		#if sys_android
 		if (!collide)
@@ -112,8 +108,12 @@ override public function onInput(input: Input)
 }
 
 // Draw
-override public function onDraw(canvas: Canvas, _)
-	canvas.draw(holding? pressed: normal, position.x, position.y);
+override public function onDraw(camera: Camera, _)
+{
+	for (simulation in (holding || !enabled? pressed: normal))
+		simulation.onDraw(camera, _);
+	transform.drawDebug(camera);
+}
 
 // Check if the user is holding over the button
 private function checkPressed()
@@ -130,12 +130,10 @@ private function checkPressed()
 	holding = false;
 }
 
-// Debug sprite
-public function addDebugSprite(simulation: Simulation)
-	box.addDebugSprite(simulation);
-
 // Representation
 public inline function toString()
-	return 'Button(${ box.x }, ${ box.y }, ${ box.width }, ${ box.height })';
+	return
+		'Button(${ transform.left() }, ${ transform.top() }, '
+		+ '${ transform.width() }, ${ transform.height() })';
 
 }

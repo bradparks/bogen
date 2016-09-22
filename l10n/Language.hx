@@ -1,8 +1,8 @@
 package bogen.l10n;
 
 // Supported languages
-enum Language
+@:enum abstract Language(Int)
 {
-	EN;
-	PT;
+	public var EN = 1;
+	public var PT = 2;
 }

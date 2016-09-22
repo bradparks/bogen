@@ -1,53 +1,50 @@
 package bogen.render;
 
-import bogen.simulation.BaseSimulation;
-import bogen.types.Vec;
-import bogen.simulation.TimeStep;
-import kha.FastFloat;
+import bogen.component.Component;
+import bogen.transform.PivotType;
+import bogen.transform.Transform;
 
-class Sprite extends BaseSimulation
+class Sprite extends Component
 {
 
 // Frame to draw
 public var frame: Frame;
 
-// Position and speed
-public var position: Vec;
-public var speed: Vec;
-
-// Vertical and horizontal scale
-public var scale: Vec;
+// Transform
+public var transform: Transform;
 
 // Constructor
-public function new(frame: Frame, positionX: FastFloat, positionY: FastFloat)
+public function new(frame: Frame, transform: Transform)
 {
 	this.frame = frame;
-	position = new Vec(positionX, positionY);
-	speed = Vec.empty();
-	scale = new Vec(1, 1);
-}
-
-// Update
-override public function onUpdate(timeStep: TimeStep)
-{
-	super.onUpdate(timeStep);
-	position.addInPlaceScaled(speed, timeStep.elapsed);
+	this.transform = transform;
 }
 
 // Draw
-override public function onDraw(canvas: Canvas, timeStep: TimeStep)
+override public function onDraw(camera: Camera, _)
+	camera.draw(frame, transform);
+
+// Create a new sprite as a child of a transform
+public static function create
+(
+	frame: Frame, x: Float, y: Float,
+	?parentTransform: Transform,
+	parentPivotX = PivotType.START, parentPivotY = PivotType.START,
+	pivotX = PivotType.START, pivotY = PivotType.START
+)
 {
-	canvas.drawResized
+	if (parentTransform == null) parentTransform = Camera.main.transform;
+	
+	return new Sprite
 	(
-		frame,
-		position.x, position.y,
-		frame.width * scale.x, frame.height * scale.y
+		frame, 
+		parentTransform.child
+		(
+			x, y, frame.width, frame.height,
+			parentPivotX, parentPivotY, 0,
+			pivotX, pivotY
+		)
 	);
-	
-	canvas.drawDebugRectangle
-		(position.x, position.y, frame.width, frame.height);
-	
-	super.onDraw(canvas, timeStep);
 }
 
 }

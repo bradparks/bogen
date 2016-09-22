@@ -1,10 +1,9 @@
-package bogen.simulation;
+package bogen;
 
 import bogen.input.InputManager;
-import bogen.render.Canvas;
+import bogen.render.Camera;
+import bogen.simulation.TimeStep;
 import kha.Assets;
-import kha.Color;
-import kha.FastFloat;
 import kha.Framebuffer;
 import kha.Scheduler;
 import kha.System;
@@ -13,19 +12,16 @@ import kha.System;
 @:access(kha.System, kha.Scheduler)
 class Game
 {
-
+	
 // Current scene
 @:allow(bogen.input.InputManager)
 private static var scene: Scene;
 
 // Update period
-public static var updatePeriod: FastFloat;
-
-// Canvas
-public static var canvas: Canvas;
+public static var updatePeriod: Float;
 
 // Last render time
-private static var lastRenderTime: FastFloat;
+private static var lastRenderTime: Float;
 
 // Time passed between events
 private static var renderStep: TimeStep;
@@ -36,41 +32,28 @@ public static function init
 (
 	title: String,
 	screenWidth: Int, screenHeight: Int,
-	canvasWidth: FastFloat, canvasHeight: FastFloat,
-	updatesPerRender: Int,
-	backgroundColor: Color,
+	cameraWidth: Int, cameraHeight: Int,
 	onReady: Void->Void
 )
 {
 	scene = new Scene();
 	
 	renderStep = new TimeStep(1 / 60, 1);
-	updateStep = new TimeStep(renderStep.elapsed / updatesPerRender, 1);
-	
-	// Clears the screen
-	System.notifyOnRender(function(framebuffer)
-	{
-		framebuffer.g2.begin(true, backgroundColor);
-		framebuffer.g2.end();
-	});
+	updateStep = new TimeStep(renderStep.elapsed, 1);
 	
 	// Called by Kha when the game is ready
 	function onInit()
 	{
 		Assets.loadEverything(function()
 		{
-			// Removes the previous render notifier
-			System.renderListeners.pop();
-			
-			// Canvas
-			canvas = new Canvas
+			// Camera
+			var camera = new Camera
 			(
 				System.windowWidth(), System.windowHeight(),
-				canvasWidth, canvasHeight,
-				backgroundColor
+				cameraWidth, cameraHeight
 			);
 			
-			InputManager.init(canvas.scale);
+			InputManager.init(camera.transform);
 			System.notifyOnRender(onRender);
 			
 			// Callback
@@ -94,35 +77,24 @@ public static function onGameUpdate() scene.onUpdate(updateStep);
 
 // Called by Kha to draw
 public static function onRender(framebuffer: Framebuffer)
-{	
+{
+	var camera = Camera.main;
+	
 	// Initialize buffer
-	canvas.beginBuffer(framebuffer);
+	camera.beginBuffer(framebuffer);
 	
 	// Update render elapsed
 	renderStep.set(Scheduler.time() - lastRenderTime, 1);
 	lastRenderTime = Scheduler.time();
 	
 	// Draw scene
-	scene.onDraw(canvas, renderStep);
+	scene.onDraw(camera, renderStep);
 	
 	// Draw debug information
-	InputManager.drawPointer(canvas);
+	InputManager.drawPointer(camera);
 	
 	// Update screen and finishes buffer
-	canvas.endBuffer();
-}
-
-// Count the objects in a simulation
-public static function objectCount(simulation: BaseSimulation)
-{
-	var result = 1;
-	
-	var children: Array<BaseSimulation> = Reflect.field
-		(simulation, "children");
-	if (children == null) return result;
-	
-	for (child in children) result += objectCount(child);
-	return result;
+	camera.endBuffer();
 }
 
 // Set the current scene

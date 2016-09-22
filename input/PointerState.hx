@@ -1,10 +1,10 @@
 package bogen.input;
 
 // Pointer state in a input
-enum PointerState 
+@:enum abstract PointerState(Int)
 {
-	NONE;
-	JUST_PRESSED;
-	JUST_RELEASED;
-	MOVING;
+	public var NONE = 0;
+	public var JUST_PRESSED = 1;
+	public var JUST_RELEASED = 2;
+	public var MOVING = 3;
 }

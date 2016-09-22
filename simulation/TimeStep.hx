@@ -1,31 +1,29 @@
 package bogen.simulation;
 
-import kha.FastFloat;
-
 // Time passed between events
 class TimeStep
 {
 
 // Time passed
-public var elapsed(default, null): FastFloat;
+public var elapsed(default, null): Float;
 
 // Time passed without scale
-public var realElapsed(default, null): FastFloat;
+public var realElapsed(default, null): Float;
 
 // Constructor
-public function new(realElapsed: FastFloat, scale: FastFloat)
+public function new(realElapsed: Float, scale: Float)
 	set(realElapsed, scale);
 
 // Change the elapsed time
-@:allow(bogen.simulation.Game)
-private inline function set(realElapsed: FastFloat, scale: FastFloat)
+@:allow(bogen.Game)
+private inline function set(realElapsed: Float, scale: Float)
 {
 	this.realElapsed = realElapsed;
 	elapsed = realElapsed * scale;
 }
 
 // Creates a new TimeStep with a different scale
-public function changeScale(scale: FastFloat)
+public function changeScale(scale: Float)
 	return new TimeStep(realElapsed, scale);
 	
 // Pauses time

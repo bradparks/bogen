@@ -1,7 +1,5 @@
 package bogen.utils;
 
-import kha.FastFloat;
-
 #if (sys_android && !bogen_no_ads)
 
 import kha.Scheduler;
@@ -11,11 +9,11 @@ class Appodeal
 {
 
 // Banner height
-public static var bannerHeight(default, null): FastFloat;
+public static var bannerHeight(default, null): Float;
 
 // Interstitial time
-private static var isterstitialInterval: FastFloat;
-private static var lastInterstitialTime: FastFloat;
+private static var isterstitialInterval: Float;
+private static var lastInterstitialTime: Float;
 
 // Initialize. This function cannot be inlined
 public static function init(appKey: String, interstitialTime: Int)

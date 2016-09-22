@@ -1,8 +1,8 @@
 package bogen.input;
 
-import bogen.types.ConstVec;
-import bogen.types.Vec;
-import kha.FastFloat;
+import bogen.math.Vec;
+import bogen.render.Camera;
+import bogen.utils.Maybe;
 import kha.Key;
 
 @:allow(bogen.input.InputManager)
@@ -17,17 +17,17 @@ public var isDragging: Bool;
 
 // Pointer state
 public var pointerState(default, null): PointerState;
-public var pointerPosition(default, null): ConstVec;
+public var pointerPosition(default, null): Vec;
 public var pointerIndex(default, null): Int;
 
 // Keyboard input
-public var keyType: Key;
-public var keyCode: String;
+public var keyType: Maybe<Key>;
+public var keyCode: Maybe<String>;
 
 // Constructor
 public function new()
 {
-	pointerPosition = new ConstVec(0, 0);
+	pointerPosition = new Vec(0, 0);
 	reset();
 }
 
@@ -40,18 +40,22 @@ private function reset()
 	pointerState = PointerState.NONE;
 	pointerIndex = -1;
 	
-	keyType = null;
-	keyCode = null;
+	keyType = Maybe.none();
+	keyCode = Maybe.none();
 }
 
 // Reset to pointer state
-private function resetWithPointer
-(
-	x: FastFloat, y: FastFloat, scale: FastFloat,
-	pointerState: PointerState, pointerIndex: Int = -1
-)
+private function resetWithScreenPointer
+	(x: Float, y: Float, pointerState: PointerState, pointerIndex: Int = -1)
 {
-	cast (pointerPosition, Vec).set(x / scale, y / scale);
+	var cameraPosition = Camera.main.transform.position;
+	var cameraScale = Camera.main.transform.cameraScale;
+	
+	pointerPosition.set
+	(
+		x / cameraScale + cameraPosition.x,
+		y / cameraScale + cameraPosition.y
+	);
 	
 	reset();
 	
@@ -72,14 +76,16 @@ public inline function pointerMoving()
 	return pointerState == PointerState.MOVING;
 
 // Check if a key has just been pressed
-public inline function anyKey() return keyType != null;
+public inline function anyKey() return keyType.orNull() != null;
 
 // Representation
 public inline function toString()
 {
-	if (anyKey()) return 'Input(key($keyType, "$keyCode"))';
-	return 'Input((${ pointerPosition.x }, ${ pointerPosition.y })'
-		+ ', $pointerState, $pointerIndex';
+	return
+		if (anyKey())
+			'Input(key(${ keyType.orNull() }, "${ keyCode.orNull() }"))';
+		else 'Input((${ pointerPosition.x }, ${ pointerPosition.y })'
+			+ ', $pointerState, $pointerIndex';
 }
 
 }

@@ -1,19 +1,17 @@
-package bogen.simulation;
+package bogen.component;
 
-import kha.FastFloat;
-
-// Timer simulation, dispatch an event when finished
-class Timer extends BaseSimulation
+// Timer. Dispatch a callback when finished
+class Timer extends Component
 {
 
 // Remaining time
-private var remaining: FastFloat;
+private var remaining: Float;
 
 // Called on finish
 public var onFinish: Void->Void;
 
 // Constructor
-public function new(remaining: FastFloat, onFinish: Void->Void)
+public function new(remaining: Float, onFinish: Void->Void)
 {
 	this.remaining = remaining;
 	this.onFinish = onFinish;

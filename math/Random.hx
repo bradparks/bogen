@@ -1,7 +1,5 @@
 package bogen.math;
 
-import kha.FastFloat;
-
 // Random number generator
 class Random
 {
@@ -10,11 +8,11 @@ class Random
 private static inline var MAX_INT = 0x7fffffff;
 	
 // Seed
-private var seed: FastFloat;
+private var seed: Float;
 
 // Constructor
 public inline function new(?seed: Int)
-{	
+{
 	if (seed == null) this.seed = Std.int(1 + Math.random() * (MAX_INT - 2));
 	else this.seed = seed;
 }
@@ -28,7 +26,7 @@ public inline function int(): Int
 }
 
 // Returns a float number betewen [0, 1[
-public inline function float(): FastFloat
+public inline function float(): Float
 {
 	return int() / MAX_INT;
 }
@@ -40,27 +38,27 @@ public inline function intRange(min: Int, max: Int): Int
 }
 
 // Returns a float number between [min, max]
-public inline function floatRange(min: FastFloat, max: FastFloat): FastFloat
+public inline function floatRange(min: Float, max: Float): Float
 {
 	return min + float() * (max - min);
 }
 
 // Returns "true" given the chance
-public inline function bool(chance: FastFloat = .5): Bool
+public inline function bool(chance: Float = .5): Bool
 {
 	return float() < chance;
 }
 
 // Return "1" given the chance
-public inline function sign(chance: FastFloat = .5): Int
+public inline function sign(chance: Float = .5): Int
 {
 	return bool(chance)? 1: -1;
 }
 
 // Returns the index of a random probability
-public function probability(list: Array<FastFloat>): Int
+public function probability(list: Array<Float>): Int
 {
-	var chance: FastFloat = 0;
+	var chance = .0;
 	for (item in list) chance += item;
 	
 	var result = floatRange(0, chance);
@@ -76,8 +74,6 @@ public function probability(list: Array<FastFloat>): Int
 
 // Returns a random element
 public function choose<T>(array: Array<T>)
-{
 	return array[intRange(0, array.length - 1)];
-}
 
 }

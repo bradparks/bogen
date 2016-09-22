@@ -1,9 +1,10 @@
 package bogen.input;
 
-import bogen.render.Canvas;
-import bogen.simulation.Game;
-import kha.Color;
-import kha.FastFloat;
+import bogen.render.Camera;
+import bogen.transform.PivotType;
+import bogen.transform.ScaleType;
+import bogen.transform.Transform;
+import bogen.utils.Maybe;
 import kha.Key;
 import kha.input.Keyboard;
 import kha.input.Mouse;
@@ -15,19 +16,14 @@ class InputManager
 // Input to be handled
 private static var input: Input;
 
-// Canvas scale. Used to correct pointer's position
-private static var scale: FastFloat;
-
 // Is the back button being held?
 @:require(sys_android)
 private static var isBackButtonPressed: Bool;
 
 // Initialize
-@:allow(bogen.simulation.Game)
-private static function init(scale: FastFloat)
+@:allow(bogen.Game)
+private static function init(transform: Transform)
 {
-	InputManager.scale = scale;
-	
 	input = new Input();
 	
 	#if sys_android
@@ -51,14 +47,14 @@ private static function init(scale: FastFloat)
 // Called by kha on mouse or touch down
 private static function downListener(index: Int, x: Int, y: Int)
 {
-	input.resetWithPointer(x, y, scale, PointerState.JUST_PRESSED, index);
+	input.resetWithScreenPointer(x, y, PointerState.JUST_PRESSED, index);
 	Game.scene.onInput(input);
 }
 
 // Called by kha on mouse or touch up
 private static function upListener(index: Int, x: Int, y: Int)
 {
-	input.resetWithPointer(x, y, scale, PointerState.JUST_RELEASED, index);
+	input.resetWithScreenPointer(x, y, PointerState.JUST_RELEASED, index);
 	Game.scene.onInput(input);
 }
 
@@ -67,7 +63,7 @@ private static function upListener(index: Int, x: Int, y: Int)
 // Called by kha on touch drag
 private static function touchDragListener(index: Int, x: Int, y: Int)
 {
-	input.resetWithPointer(x, y, scale, PointerState.MOVING, index);
+	input.resetWithScreenPointer(x, y, PointerState.MOVING, index);
 	Game.scene.onInput(input);
 }
 
@@ -76,7 +72,7 @@ private static function touchDragListener(index: Int, x: Int, y: Int)
 // Called by kha on mouse move
 private static function mouseMoveListener(x: Int, y: Int, _, _)
 {
-	input.resetWithPointer(x, y, scale, PointerState.MOVING);
+	input.resetWithScreenPointer(x, y, PointerState.MOVING);
 	Game.scene.onInput(input);
 }
 
@@ -95,8 +91,8 @@ private static function onKeyPressed(key: Key, code: String)
 
 	input.reset();
 	
-	input.keyType = key;
-	input.keyCode = code;
+	input.keyType = Maybe.some(key);
+	input.keyCode = Maybe.some(code);
 	
 	Game.scene.onInput(input);
 }
@@ -108,17 +104,20 @@ private static function onKeyReleased(key: Key, code: String)
 #end
 
 // Draw the pointer on screen
-public static inline function drawPointer(canvas: Canvas)
+public static inline function drawPointer(camera: Camera)
 {
 	#if (debug && bogen_pointer_position)
-	var oldColor = canvas.graphic.color;
-	canvas.graphic.color = Color.Red;
-	canvas.graphic.drawRect
+	var size = 7;
+	
+	var pointerTransform = camera.transform.child
 	(
-		input.pointerPosition.x, input.pointerPosition.y,
-		5, 5, 1 / canvas.scale
+		input.pointerPosition.x - camera.transform.position.x,
+		input.pointerPosition.y - camera.transform.position.y,
+		size, size, PivotType.START, PivotType.START,
+		0, PivotType.CENTER, PivotType.CENTER,
+		ScaleType.NORMAL, ScaleType.NORMAL, 0xffff0000
 	);
-	canvas.graphic.color = oldColor;
+	camera.drawFill(pointerTransform);
 	#end
 }
 

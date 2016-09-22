@@ -1,180 +1,88 @@
 package bogen.render;
 
-import bogen.simulation.BaseSimulation;
-import bogen.types.Vec;
-import bogen.simulation.TimeStep;
-import kha.Color;
-import kha.FastFloat;
+import bogen.component.Component;
+import bogen.math.Size;
+import bogen.transform.PivotType;
+import bogen.transform.Transform;
 import kha.Font;
 
-class Text extends BaseSimulation
+// Draw a multiline text string
+class Text extends Component
 {
 
-// Pre rendered fonts
-@:require(debug)
-private static var preRendered: Array<{ font: Font, size: Int }>;
-
-// Text itself
-public var text(default, null): String;
-private var processedText: Array<Array<String>>;
-
-// Font information
-public var font: Font;
-public var size: Int;
-public var color: Color;
-
-// Text position
-public var position: Vec;
-
-// Line height in pixels and percent
-private var defaultLineHeight: FastFloat;
-private var percentLineHeight: FastFloat;
-private var paragraphHeight: FastFloat;
-
-// Velocidade do sprite
-public var speed: Vec;
-
-// Box
-public var box: Vec;
-
-// Pre renders a font with the specified sizes
-public static inline function initFont(font: Font, sizes: Array<Int>)
-{
-	#if debug
-	preRendered = [];
-	#end
+// Text's height
+private var textHeight: Float;
 	
-	for (size in sizes)
-	{
-		#if debug
-			preRendered.push({ font: font, size: size });
-		#else
-			font.width(size, "t");
-		#end
-	}
-}
+// Text to draw
+public var text: Array<Array<String>>;
+
+// Font
+public var font: Font;
+public var fontSize: Int;
+
+// Transform
+public var transform: Transform;
+
+// Spacing
+public var leading: Float;
+public var spaceAfter: Float;
 
 // Constructor
 public function new
 (
-	text: String, font: Font, size: Int, color: Color,
-	positionX: FastFloat, positionY: FastFloat
+	text: Array<Array<String>>, font: Font, fontSize: Int,
+	leading: Float, spaceAfter: Float,
+	transform: Transform
 )
 {
-	#if debug
-	var isPreRendered = false;
-	
-	for (pre in preRendered)
-	{
-		if (pre.font == font && pre.size == size)
-		{
-			isPreRendered = true;
-			break;
-		}
-	}
-	
-	if (!isPreRendered)
-	{
-		trace('Warning: Font size $size not in pre-rendered fonts.');
-		preRendered.push({ font: font, size: size });
-	}
-	#end
-	
 	this.text = text;
-	processedText = splitString(text);
 	
 	this.font = font;
-	this.size = size;
-	this.color = color;
+	this.fontSize = fontSize;
 	
-	position = new Vec(positionX, positionY);
+	this.transform = transform;
 	
-	defaultLineHeight = font.height(size);
-	percentLineHeight = 1.2;
-	paragraphHeight = 1.8;
+	textHeight = font.height(fontSize);
 	
-	box = boxSize();
-}
-
-// Text size
-private function boxSize()
-{
-	var result = new Vec
-	(
-		0,
-		(processedText.length - 1)
-		* defaultLineHeight
-		* (paragraphHeight - percentLineHeight)
-	);
-	
-	for (paragraph in processedText)
-	{
-		result.y +=
-			paragraph.length * defaultLineHeight * percentLineHeight;
-		
-		for (line in paragraph)
-		{
-			var size = font.width(size, line);
-			if (size > result.x) result.x = size;
-		}
-	}
-	
-	return result;
+	this.leading = leading;
+	this.spaceAfter = spaceAfter;
 }
 
 // Draw
-override public function onDraw(canvas: Canvas, timeStep: TimeStep)
+override public function onDraw(camera: Camera, _)
 {
-	var g = canvas.graphic;
+	camera.setupDraw(transform);
 	
-	g.fontSize = size;
-	g.font = font;
+	var graphic = camera.graphic;
 	
-	var oldColor = g.color;
-	g.color = color;
+	graphic.font = font;
+	graphic.fontSize = fontSize;
 	
-	var y = position.y;
+	var x = transform.left();
+	var y = transform.top();
 	
-	for (paragraph in processedText)
+	for (paragraph in text)
 	{
 		for (line in paragraph)
 		{
-			g.drawString(line, position.x, y);
-			y += defaultLineHeight * percentLineHeight;
+			graphic.drawString(line, x, y);
+			y += textHeight + leading;
 		}
 		
-		y += defaultLineHeight * (paragraphHeight - percentLineHeight);
+		y += spaceAfter - leading;
 	}
 	
-	g.color = oldColor;
+	transform.drawDebug(camera);
 	
-	canvas.drawDebugRectangle(position.x, position.y, box.x, box.y, 1);
+	camera.cleanupDraw(transform);
 }
 
-// Centralized text
-public static function central
-(
-	text: String, font: Font, size: Int, color: Color,
-	centerX: FastFloat, centerY: FastFloat
-)
-{
-	var result = new Text(text, font, size, color, 0, 0);
-	
-	result.position.x = centerX - result.box.x / 2;
-	result.position.y = centerY - result.box.y / 2;
-	
-	return result;
-}
+// Copy
+public function copy()
+	return
+		new Text(text, font, fontSize, leading, spaceAfter, transform.copy());
 
-// How many lines the text has
-public function countLines()
-{
-	var lines = 0;
-	for (paragraph in processedText) lines += paragraph.length;
-	return lines;
-}
-
-// Splits a string at into an Array<Array<String>> at \n and \n\n
+// Splits a string into an Array<Array<String>> at \n and \n\n
 public static function splitString(s: String)
 {
 	var result = [];
@@ -187,6 +95,57 @@ public static function splitString(s: String)
 	}
 	
 	return result;
+}
+
+// Get the text size
+public static function getSize
+(
+	text: Array<Array<String>>,
+	font: Font, fontSize: Int, leading: Float, spaceAfter: Float
+)
+{
+	var result = new Size(0, (text.length - 1) * spaceAfter);
+	var textHeight = font.height(fontSize);
+	
+	for (paragraph in text)
+	{
+		result.height +=
+			paragraph.length * textHeight
+			+ (paragraph.length - 1) * leading;
+		for (line in paragraph)
+		{
+			var size = font.width(fontSize, line);
+			if (size > result.width) result.width = size;
+		}
+	}
+	
+	return result;
+}
+
+// Create a new text as child of a transform
+@SuppressWarnings("checkstyle:ParameterNumber")
+public static function create
+(
+	string: String, font: Font, fontSize: Int, x: Float, y: Float,
+	?parentTransform: Transform,
+	leading: Float = 0, spaceAfter: Float = 0,
+	parentPivotX = PivotType.START, parentPivotY = PivotType.START,
+	pivotX = PivotType.START, pivotY = PivotType.START
+)
+{
+	if (parentTransform == null) parentTransform = Camera.main.transform;
+	
+	var text = splitString(string);
+	var size = getSize(text, font, fontSize, leading, spaceAfter);
+	
+	var transform = parentTransform.child
+	(
+		x, y, size.width, size.height,
+		parentPivotX, parentPivotY, 0,
+		pivotX, pivotY
+	);
+	
+	return new Text(text, font, fontSize, leading, spaceAfter, transform);
 }
 
 }
