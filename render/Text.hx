@@ -3,14 +3,16 @@ package bogen.render;
 import bogen.component.Component;
 import bogen.math.Size;
 import bogen.transform.PivotType;
+import bogen.transform.ScaleType;
 import bogen.transform.Transform;
+import kha.Color;
 import kha.Font;
 
 // Draw a multiline text string
 class Text extends Component
 {
 
-// Text's height
+// Text height
 private var textHeight: Float;
 	
 // Text to draw
@@ -83,15 +85,15 @@ public function copy()
 		new Text(text, font, fontSize, leading, spaceAfter, transform.copy());
 
 // Splits a string into an Array<Array<String>> at \n and \n\n
-public static function splitString(s: String)
+public static function splitString(string: String)
 {
 	var result = [];
 	
-	for (p in s.split("\n\n"))
+	for (paragraph in string.split("\n\n"))
 	{
-		var paragraph = [];
-		for (l in p.split("\n")) paragraph.push(l);
-		result.push(paragraph);
+		var paragraphResult = [];
+		for (line in paragraph.split("\n")) paragraphResult.push(line);
+		result.push(paragraphResult);
 	}
 	
 	return result;
@@ -126,7 +128,7 @@ public static function getSize
 @SuppressWarnings("checkstyle:ParameterNumber")
 public static function create
 (
-	string: String, font: Font, fontSize: Int, x: Float, y: Float,
+	string: String, font: Font, fontSize: Int, x: Float, y: Float, color: Color,
 	?parentTransform: Transform,
 	leading: Float = 0, spaceAfter: Float = 0,
 	parentPivotX = PivotType.START, parentPivotY = PivotType.START,
@@ -142,7 +144,7 @@ public static function create
 	(
 		x, y, size.width, size.height,
 		parentPivotX, parentPivotY, 0,
-		pivotX, pivotY
+		pivotX, pivotY, ScaleType.NORMAL, ScaleType.NORMAL, color
 	);
 	
 	return new Text(text, font, fontSize, leading, spaceAfter, transform);

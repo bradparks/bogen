@@ -17,7 +17,9 @@ public function new() children = [];
 // Add a child
 public inline function add(child: T) children.push(child);
 
-// Removes a child
+/* Removes a child.
+ * Make a copy of the array to avoid removing while iterating over it.
+ * The iteration will continue on the original children. */
 public inline function remove(child: T)
 {
 	children = children.copy();

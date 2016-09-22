@@ -13,6 +13,7 @@ public var onUpdateFunction: TimeStep->Void;
 public var onInputFunction: Input->Void;
 public var onDrawFunction: Camera->TimeStep->Void;
 
+// Constructor
 public function new
 (
 	onUpadteFunction: TimeStep->Void,

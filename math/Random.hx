@@ -26,34 +26,23 @@ public inline function int(): Int
 }
 
 // Returns a float number betewen [0, 1[
-public inline function float(): Float
-{
-	return int() / MAX_INT;
-}
+public inline function float(): Float return int() / MAX_INT;
 
 // Returns an integer between [min, max]
 public inline function intRange(min: Int, max: Int): Int
-{
 	return Math.floor(min + float() * (max - min + 1));
-}
 
 // Returns a float number between [min, max]
 public inline function floatRange(min: Float, max: Float): Float
-{
 	return min + float() * (max - min);
-}
 
 // Returns "true" given the chance
 public inline function bool(chance: Float = .5): Bool
-{
 	return float() < chance;
-}
 
 // Return "1" given the chance
 public inline function sign(chance: Float = .5): Int
-{
 	return bool(chance)? 1: -1;
-}
 
 // Returns the index of a random probability
 public function probability(list: Array<Float>): Int

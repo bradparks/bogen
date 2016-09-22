@@ -21,7 +21,7 @@ public function new(transform: Transform, velocity: Float)
 	this.velocity = velocity;
 }
 
-// Update. Applies the angular velocity
+// Applies the angular velocity
 override public function onUpdate(timeStep: TimeStep)
 	transform.angle += velocity * timeStep.elapsed;
 

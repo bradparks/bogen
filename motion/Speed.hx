@@ -5,7 +5,7 @@ import bogen.math.Vec;
 import bogen.simulation.TimeStep;
 import bogen.transform.Transform;
 
-// Linear moviment
+// Linear movement
 class Speed extends Component
 {
 	
@@ -22,7 +22,7 @@ public function new(transform: Transform, speed: Vec)
 	this.speed = speed;
 }
 
-// Update. Applies the angular velocity
+// Applies the speed
 override public function onUpdate(timeStep: TimeStep)
 {
 	transform.position.addScalarInPlace

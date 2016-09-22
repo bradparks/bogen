@@ -2,7 +2,7 @@ package bogen.math;
 
 import kha.math.FastVector2;
 
-// FastVector2 with alias for width and height
+// Vec with alias for width and height
 @:notNull
 @:forward(
 	x, y, length, add, sub, mult, div, dot, normalize,

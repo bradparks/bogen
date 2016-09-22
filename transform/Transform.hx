@@ -32,8 +32,7 @@ public var color: Color;
 /*
  * Constructor.
  * Generally you should use the `child` method of Camera.main.transform or other
- * transform to create one
- * */
+ * transform to create one. */
 private function new
 (
 	x: Float, y: Float, width: Float, height: Float,

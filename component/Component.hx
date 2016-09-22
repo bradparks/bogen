@@ -11,19 +11,19 @@ class Component
 // Called when the component should handle input
 public function onInput(input: Input)
 {
-	// EMPTY
+	// Empty
 }
 
 // Called when the component should update
 public function onUpdate(timeStep: TimeStep): Void
 {
-	// EMPTY
+	// Empty
 }
 
 // Called when the component should draw
 public function onDraw(camera: Camera, timeStep: TimeStep): Void
 {
-	// EMPTY
+	// Empty
 }
 
 }
