@@ -2,7 +2,7 @@ package bogen.render;
 
 import bogen.component.Component;
 import bogen.math.Size;
-import bogen.transform.PivotType;
+import bogen.transform.RelativePivot;
 import bogen.transform.ScaleType;
 import bogen.transform.Transform;
 import kha.Color;
@@ -129,13 +129,12 @@ public static function getSize
 public static function create
 (
 	string: String, font: Font, fontSize: Int, x: Float, y: Float, color: Color,
-	?parentTransform: Transform,
-	leading: Float = 0, spaceAfter: Float = 0,
-	parentPivotX = PivotType.START, parentPivotY = PivotType.START,
-	pivotX = PivotType.START, pivotY = PivotType.START
+	?parentTransform: Transform, ?pivot: RelativePivot,
+	leading: Float = 0, spaceAfter: Float = 0
 )
 {
 	if (parentTransform == null) parentTransform = Camera.main.transform;
+	if (pivot == null) pivot = RelativePivot.TOP_LEFT;
 	
 	var text = splitString(string);
 	var size = getSize(text, font, fontSize, leading, spaceAfter);
@@ -143,8 +142,7 @@ public static function create
 	var transform = parentTransform.child
 	(
 		x, y, size.width, size.height,
-		parentPivotX, parentPivotY, 0,
-		pivotX, pivotY, ScaleType.NORMAL, ScaleType.NORMAL, color
+		pivot, 0, ScaleType.NORMAL, ScaleType.NORMAL, color
 	);
 	
 	return new Text(text, font, fontSize, leading, spaceAfter, transform);

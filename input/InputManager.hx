@@ -1,7 +1,7 @@
 package bogen.input;
 
 import bogen.render.Camera;
-import bogen.transform.PivotType;
+import bogen.transform.RelativePivot;
 import bogen.transform.ScaleType;
 import bogen.transform.Transform;
 import bogen.utils.Maybe;
@@ -113,9 +113,8 @@ public static inline function drawPointer(camera: Camera)
 	(
 		input.pointerPosition.x - camera.transform.position.x,
 		input.pointerPosition.y - camera.transform.position.y,
-		size, size, PivotType.START, PivotType.START,
-		0, PivotType.CENTER, PivotType.CENTER,
-		ScaleType.NORMAL, ScaleType.NORMAL, 0xffff0000
+		size, size, RelativePivot.TOP_LEFT,
+		0, ScaleType.NORMAL, ScaleType.NORMAL, 0xffff0000
 	);
 	camera.drawFill(pointerTransform);
 	#end

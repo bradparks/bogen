@@ -31,14 +31,14 @@ public var color: Color;
 
 /*
  * Constructor.
- * Generally you should use the `child` method of Camera.main.transform or other
- * transform to create one. */
+ * Generally you should use `Transform.create` or `anotherTransform.child`
+ * to create a new instance. */
 private function new
 (
 	x: Float, y: Float, width: Float, height: Float,
 	angle: Float = 0,
-	pivotX: Float = PivotType.START, pivotY: Float = PivotType.START,
-	scaleX: Float = ScaleType.NORMAL, scaleY: Float = ScaleType.NORMAL,
+	pivotX = PivotType.START, pivotY = PivotType.START,
+	scaleX = ScaleType.NORMAL, scaleY = ScaleType.NORMAL,
 	color: Color = 0xffffffff
 )
 {
@@ -74,6 +74,10 @@ public inline function verticalCenter() return vertical(PivotType.CENTER);
 // Check if a point collide with the transform. Won't take rotation into account
 public function collidePoint(x: Float, y: Float)
 	return x >= left() && x <= right() && y >= top() && y <= bottom();
+
+// Check vertical collision
+public function collideY(y: Float, height: Float)
+	return top() <= y + height && bottom() >= y;
 	
 // Copy
 public function copy()
@@ -106,20 +110,35 @@ public inline function createDebugRect(parent: Simulation)
 public inline function child
 (
 	x: Float, y: Float, width: Float, height: Float,
-	parentPivotX: Float = PivotType.START,
-	parentPivotY: Float = PivotType.START,
+	?pivot: RelativePivot,
 	angle: Float = 0,
-	pivotX: Float = PivotType.START, pivotY: Float = PivotType.START,
-	scaleX: Float = ScaleType.NORMAL, scaleY: Float = ScaleType.NORMAL,
-	color: Color = 0xffffffff
+	scaleX = ScaleType.NORMAL, scaleY = ScaleType.NORMAL,
+	color = Color.White
 )
 {
+	if (pivot == null) pivot = RelativePivot.TOP_LEFT;
+	
 	return new Transform
 	(
-		horizontal(parentPivotX) + x, vertical(parentPivotY) + y,
+		horizontal(pivot.parentPivotX) + x, vertical(pivot.parentPivotY) + y,
 		width, height,
-		angle, pivotX, pivotY, scaleX, scaleY, color
+		angle, pivot.pivotX, pivot.pivotY, scaleX, scaleY, color
 	);
+}
+
+// Create a transform as a child of the main camera
+@SuppressWarnings("checkstyle:ParameterNumber")
+public static inline function create
+(
+	x: Float, y: Float, width: Float, height: Float,
+	?pivot: RelativePivot,
+	angle: Float = 0,
+	scaleX = ScaleType.NORMAL, scaleY = ScaleType.NORMAL,
+	color = Color.White
+)
+{
+	return Camera.main.transform.child
+		(x, y, width, height, pivot, angle, scaleX, scaleY, color);
 }
 
 }

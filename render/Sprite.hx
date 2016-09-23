@@ -1,8 +1,10 @@
 package bogen.render;
 
 import bogen.component.Component;
-import bogen.transform.PivotType;
+import bogen.transform.RelativePivot;
+import bogen.transform.ScaleType;
 import bogen.transform.Transform;
+import kha.Color;
 
 class Sprite extends Component
 {
@@ -29,11 +31,14 @@ public static function create
 (
 	frame: Frame, x: Float, y: Float,
 	?parentTransform: Transform,
-	parentPivotX = PivotType.START, parentPivotY = PivotType.START,
-	pivotX = PivotType.START, pivotY = PivotType.START
+	?pivot: RelativePivot,
+	angle: Float = 0,
+	scaleX = ScaleType.NORMAL, scaleY = ScaleType.NORMAL,
+	color: Color = Color.White
 )
 {
 	if (parentTransform == null) parentTransform = Camera.main.transform;
+	if (pivot == null) pivot = RelativePivot.TOP_LEFT;
 	
 	return new Sprite
 	(
@@ -41,8 +46,7 @@ public static function create
 		parentTransform.child
 		(
 			x, y, frame.width, frame.height,
-			parentPivotX, parentPivotY, 0,
-			pivotX, pivotY
+			pivot, 0, scaleX, scaleY, color
 		)
 	);
 }
