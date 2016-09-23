@@ -1,10 +1,10 @@
 package bogen.transform;
 
 // Pivot types
-class ScaleType
+abstract ScaleType(Float) from Float to Float
 {
 
-public static inline var INVISIBLE: Float = .0;
-public static inline var NORMAL: Float = 1.;
+public static inline var INVISIBLE: ScaleType = .0;
+public static inline var NORMAL: ScaleType = 1.;
 
 }
