@@ -23,8 +23,8 @@ public function toString()
 {
 	return switch (language) 
 	{
-		case Language.PT: pt
-		default: en
+		case Language.PT: pt;
+		default: en;
 	}
 }
 
