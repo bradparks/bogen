@@ -2,7 +2,10 @@ package bogen.render;
 
 import bogen.component.Component;
 import bogen.input.Input;
+import bogen.transform.RelativePivot;
+import bogen.transform.ScaleType;
 import bogen.transform.Transform;
+import kha.Color;
 
 // Button
 class Button extends Component
@@ -135,5 +138,30 @@ public inline function toString()
 	return
 		'Button(${ transform.left() }, ${ transform.top() }, '
 		+ '${ transform.width() }, ${ transform.height() })';
+		
+// Create a simple sprite button
+@SuppressWarnings("checkstyle:ParameterNumber")
+public static function spriteButton
+(
+	normal: Frame, pressed: Frame, x: Float, y: Float, onPress: Void->Void,
+	?parentTransform: Transform, ?pivot: RelativePivot,
+	angle: Float = 0,
+	scaleX = ScaleType.NORMAL, scaleY = ScaleType.NORMAL,
+	color = Color.White
+)
+{
+	
+	if (parentTransform == null) parentTransform = Camera.main.transform;
+	if (pivot == null) pivot = RelativePivot.TOP_LEFT;
+	
+	var transform = parentTransform.child
+	(
+		x, y, normal.width, normal.height, pivot, angle, scaleX, scaleY, color
+	);
+	
+	var normalSprite = new Sprite(normal, transform);
+	var pressedSprite = new Sprite(pressed, transform);
+	return new Button(transform, [normalSprite], [pressedSprite], onPress);
+}
 
 }
