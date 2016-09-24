@@ -134,7 +134,6 @@ public static function create
 )
 {
 	if (parentTransform == null) parentTransform = Camera.main.transform;
-	if (pivot == null) pivot = RelativePivot.TOP_LEFT;
 	
 	var text = splitString(string);
 	var size = getSize(text, font, fontSize, leading, spaceAfter);
