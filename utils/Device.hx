@@ -7,6 +7,8 @@ import com.ktxsoftware.kha.KhaActivity;
 #end
 
 // Information about the device
+
+#if sys_android @:keep #end
 class Device
 {
 
