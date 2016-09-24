@@ -1,35 +1,89 @@
 package bogen.motion;
 
-class Tween
+import bogen.component.Component;
+import bogen.simulation.Simulation;
+import bogen.simulation.TimeStep;
+
+class Tween extends Component
 {
 
-// Linear
-public static function linear(t: Float) return t;
+// Callback to change a value
+public var onChange: Float->Void;
 
-// Quad
-public static function quadIn(t: Float) return t * t;
-public static function quadOut(t: Float) return - t * (t - 2);
+// Initial and final values
+private var initialValue: Float;
+private var finalValue: Float;
 
-// Cubic
-public static function cubicIn(t: Float) return t * t * t;
-public static function cubicOut(t: Float) return (t = t - 1) * t * t + 1;
+// Difference betweem final and inital
+private var difference: Float;
 
-// Bounce
-public static function bounceIn(t: Float)
+// Total animation time
+private var animationTime: Float;
+
+// When zero, starts animating. When > animationTime, finishes.
+private var time: Float;
+
+// Parent simulation, if provided will remove itself when finished
+private var parent: Simulation;
+
+// Called when the tween finishes
+private var onFinish: Void->Void;
+
+// Easing function
+public var easing: Easing;
+
+// Constructor
+public function new
+(
+	initialValue: Float, finalValue: Float,
+	easing: Easing, onChange: Float->Void,
+	animationTime: Float, delay: Float = 0,
+	?parent: Simulation, ?onFinish: Void->Void
+)
 {
-	if (t < (1 / 2.75)) return (7.5625 * t * t);
-	if (t < (2 / 2.75)) return (7.5625 * (t -= (1.5 / 2.75)) * t + 0.75);
-	if (t < (2.5 / 2.75)) return (7.5625 * (t -= (2.25 / 2.75)) * t + 0.9375);
-	return (7.5625 * (t -= (2.625 / 2.75)) * t + 0.984375);
-}
-
-// Back
-public static function backIn(overshoot: Float, t: Float)
-{
-	if (t == 0) return 0.0;
-	if (t == 1) return 1.0;
+	this.initialValue = initialValue;
+	this.finalValue = finalValue;
+	this.easing = easing;
+	this.onChange = onChange;
+	this.animationTime = animationTime;
+	this.parent = parent;
+	this.onFinish = onFinish;
 	
-	return t * t * ((overshoot + 1) * t - overshoot);
+	time = -delay;
+	difference = finalValue - initialValue;
+	
+	#if (debug && bogen_no_animation)
+		time = animationTime;
+	#end
 }
 
+// Update
+override public function onUpdate(timeStep: TimeStep)
+{
+	time += timeStep.elapsed;
+	if (time < 0) return;
+	else if (time > animationTime)
+	{
+		if (parent != null || onFinish != null)
+		{
+			onChange(finalValue);
+			if (parent != null)
+			{
+				parent.remove(this);
+				parent = null;
+			}
+			else
+			{
+				onFinish();
+				onFinish = null;
+			}
+		}
+		
+		return;
+	}
+	
+	var ease = easing(time / animationTime);
+	onChange(initialValue + ease * difference);
+}
+	
 }

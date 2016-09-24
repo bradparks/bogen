@@ -21,9 +21,6 @@ private var difference: Vec;
 // Total animation time
 private var animationTime: Float;
 
-// Start delay
-private var delay: Float;
-
 // When zero, starts animating. When > animationTime, finishes.
 private var time: Float;
 
@@ -33,15 +30,15 @@ private var parent: Simulation;
 // Called when the tween finishes
 private var onFinish: Void->Void;
 
-// Tween function
-public var tween: Float->Float;
+// Easing function
+public var easing: Easing;
 
 // Constructor
 public function new
 (
-	vec: Vec, finalX: Float, finalY: Float, tween: Float->Float,
-	animationTime: Float, delay: Float,
-	parent: Simulation, ?onFinish: Void->Void
+	vec: Vec, finalX: Float, finalY: Float, easing: Easing,
+	animationTime: Float, delay: Float = 0,
+	?parent: Simulation, ?onFinish: Void->Void
 )
 {
 	this.vec = vec;
@@ -50,14 +47,12 @@ public function new
 	final = new Vec(finalX, finalY);
 	difference = final.sub(initial);
 	
-	this.delay = delay;
+	this.easing = easing;
 	this.animationTime = animationTime;
-	
 	this.parent = parent;
 	this.onFinish = onFinish;
 	
 	time = -delay;
-	this.tween = tween;
 	
 	#if (debug && bogen_no_animation)
 		time = animationTime;
@@ -71,26 +66,28 @@ override public function onUpdate(timeStep: TimeStep)
 	if (time < 0) return;
 	else if (time > animationTime)
 	{
-		if (parent != null)
+		if (parent != null || onFinish != null)
 		{
 			vec.set(final.x, final.y);
-			parent.remove(this);
-		}
-		
-		if (onFinish != null)
-		{
-			vec.set(final.x, final.y);
-			onFinish();
-			onFinish = null;
+			if (parent != null)
+			{
+				parent.remove(this);
+				parent = null;
+			}
+			else
+			{
+				onFinish();
+				onFinish = null;
+			}
 		}
 		
 		return;
 	}
 	
-	var deltaValue = tween(time / animationTime);
+	var ease = easing(time / animationTime);
 	
-	vec.x = initial.x + (difference.x * deltaValue);
-	vec.y = initial.y + (difference.y * deltaValue);
+	vec.x = initial.x + (difference.x * ease);
+	vec.y = initial.y + (difference.y * ease);
 }
 
 }
